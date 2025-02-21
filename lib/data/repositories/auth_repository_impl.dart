@@ -69,13 +69,17 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _dio.get(AppConstants.studentInfoEndpoint);
       
-      if (response.data['status'] == 'success') {
-        final user = User.fromJson(response.data['data']['student']);
+      if (response.statusCode == 200) {
+        final userData = response.data['data']['student'];
+        final user = User.fromJson(userData);
         return ApiResponse.success(user);
       } else {
         return ApiResponse.error(response.data['message'] ?? 'Failed to get info');
       }
     } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return ApiResponse.error('Student not found');
+      }
       return ApiResponse.error(e.response?.data['message'] ?? 'Network error');
     } catch (e) {
       return ApiResponse.error('An unexpected error occurred');
@@ -96,12 +100,15 @@ class AuthRepositoryImpl implements AuthRepository {
         },
       );
 
-      if (response.data['status'] == 'success') {
+      if (response.statusCode == 200) {
         return ApiResponse.success(null);
       } else {
-        return ApiResponse.error(response.data['message'] ?? 'Failed to change password');
+        return ApiResponse.error('Failed to change password');
       }
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return ApiResponse.error('Current password is incorrect');
+      }
       return ApiResponse.error(e.response?.data['message'] ?? 'Network error');
     } catch (e) {
       return ApiResponse.error('An unexpected error occurred');
