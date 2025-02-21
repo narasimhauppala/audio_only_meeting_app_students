@@ -26,6 +26,8 @@ class AuthRepositoryImpl implements AuthRepository {
         },
       );
 
+      print('Login Response: ${response.data}'); // Debug log
+
       if (response.statusCode == 200) {
         try {
           final user = User.fromJson(response.data);
@@ -37,19 +39,21 @@ class AuthRepositoryImpl implements AuthRepository {
           await _secureStorage.write('role', user.role);
           
           return ApiResponse.success(user);
-        } catch (parseError) {
-          print('Parse error: $parseError');
+        } catch (e) {
+          print('Parse error: $e'); // Debug log
           return ApiResponse.error('Failed to parse response data');
         }
       } else {
         return ApiResponse.error('Login failed');
       }
     } on DioException catch (e) {
+      print('DioException: ${e.message}'); // Debug log
       if (e.response?.statusCode == 401) {
         return ApiResponse.error('Invalid username or password');
       }
       return ApiResponse.error(e.response?.data['message'] ?? 'Network error');
     } catch (e) {
+      print('Unexpected error: $e'); // Debug log
       return ApiResponse.error('An unexpected error occurred');
     }
   }

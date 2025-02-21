@@ -4,6 +4,8 @@ import '../../data/local/secure_storage.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../constants/app_constants.dart';
+import '../../data/repositories/meetings_repository_impl.dart';
+import '../../domain/repositories/meetings_repository.dart';
 
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();
@@ -13,6 +15,7 @@ class ServiceLocator {
   late final Dio _dio;
   late final SecureStorage _secureStorage;
   late final AuthRepository _authRepository;
+  late final MeetingsRepository _meetingsRepository;
 
   Future<void> initialize() async {
     // Initialize Dio
@@ -54,9 +57,12 @@ class ServiceLocator {
       dio: _dio,
       secureStorage: _secureStorage,
     );
+
+    _meetingsRepository = MeetingsRepositoryImpl(dio: _dio);
   }
 
   Dio get dio => _dio;
   SecureStorage get secureStorage => _secureStorage;
   AuthRepository get authRepository => _authRepository;
+  MeetingsRepository get meetingsRepository => _meetingsRepository;
 } 

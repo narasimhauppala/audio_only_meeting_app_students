@@ -27,6 +27,15 @@ class AuthProvider extends ChangeNotifier {
       
       if (response.success && response.data != null) {
         _currentUser = response.data;
+        
+        // Check if the user is a student
+        if (!_currentUser!.isStudent) {
+          _error = 'This app is for students only';
+          _currentUser = null;
+          notifyListeners();
+          return false;
+        }
+        
         _error = null;
         notifyListeners();
         return true;

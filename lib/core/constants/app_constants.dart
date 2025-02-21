@@ -12,7 +12,7 @@ class AppConstants {
   // API Endpoints
   static const String loginEndpoint = '/auth/login';
   static const String registerEndpoint = '/auth/register';
-  static const String meetingsEndpoint = '/meetings';
+  static const String meetingsEndpoint = '/student/meetings';
   static const String profileEndpoint = '/profile';
   static const String recordingsEndpoint = '/recordings';
   static const String studentInfoEndpoint = '/student/info';

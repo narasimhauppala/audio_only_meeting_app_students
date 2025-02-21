@@ -3,25 +3,29 @@ class User {
   final String username;
   final String role;
   final bool isActive;
-  final String token;  // Added token field
+  final String token;
 
   User({
     required this.id,
     required this.username,
     required this.role,
     required this.isActive,
-    required this.token,  // Added to constructor
+    required this.token,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    // Handle the nested data structure from your API
+    final userData = json['data'] ?? json;
+    
     return User(
-      id: json['_id'],
-      username: json['username'],
-      role: json['role'],
-      isActive: true,
-      token: json['token'],  // Parse token from response
+      id: userData['_id'] ?? '',
+      username: userData['username'] ?? '',
+      role: userData['role'] ?? 'student',
+      isActive: userData['isActive'] ?? true,
+      token: userData['token'] ?? json['token'] ?? '',  // Handle both nested and direct token
     );
   }
 
   bool get isStudent => role == 'student';
+  bool get isHost => role == 'host';
 }

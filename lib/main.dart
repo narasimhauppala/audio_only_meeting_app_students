@@ -4,6 +4,7 @@ import 'core/di/service_locator.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/pages/login_page.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/providers/meetings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(
+          create: (_) => MeetingsProvider(ServiceLocator().meetingsRepository),
+        ),
       ],
       child: MaterialApp(
         title: 'Audio Meeting App',
