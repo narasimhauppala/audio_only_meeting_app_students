@@ -11,19 +11,27 @@ void main() async {
   // Initialize service locator
   await ServiceLocator().initialize();
   
-  runApp(const MyApp());
+  // Create AuthProvider instance
+  final authProvider = AuthProvider(ServiceLocator().authRepository);
+  // Check auth state before running app
+  await authProvider.checkAuthState();
+  
+  runApp(MyApp(authProvider: authProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AuthProvider authProvider;
+  
+  const MyApp({
+    required this.authProvider,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(ServiceLocator().authRepository),
-        ),
+        ChangeNotifierProvider.value(value: authProvider),
       ],
       child: MaterialApp(
         title: 'Audio Meeting App',
@@ -31,11 +39,11 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           useMaterial3: true,
         ),
-        initialRoute: '/login',
-        routes: {
-          '/login': (context) => const LoginPage(),
-          '/home': (context) => const HomePage(),
-        },
+        home: Consumer<AuthProvider>(
+          builder: (context, auth, _) {
+            return auth.isAuthenticated ? const HomePage() : const LoginPage();
+          },
+        ),
       ),
     );
   }

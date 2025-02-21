@@ -28,32 +28,28 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (response.statusCode == 200) {
         try {
-          print('Response data: ${response.data}'); // Debug log
           final user = User.fromJson(response.data);
           
-          // Store token and user info
+          // Store all necessary user data
           await _secureStorage.write('token', user.token);
           await _secureStorage.write('user_id', user.id);
+          await _secureStorage.write('username', user.username);
+          await _secureStorage.write('role', user.role);
           
           return ApiResponse.success(user);
         } catch (parseError) {
-          print('Parse error: $parseError'); // Debug log
+          print('Parse error: $parseError');
           return ApiResponse.error('Failed to parse response data');
         }
       } else {
-        print('Non-200 status code: ${response.statusCode}'); // Debug log
         return ApiResponse.error('Login failed');
       }
     } on DioException catch (e) {
-      print('DioException: ${e.message}'); // Debug log
-      print('Response: ${e.response?.data}'); // Debug log
-      
       if (e.response?.statusCode == 401) {
         return ApiResponse.error('Invalid username or password');
       }
       return ApiResponse.error(e.response?.data['message'] ?? 'Network error');
     } catch (e) {
-      print('Unexpected error: $e'); // Debug log
       return ApiResponse.error('An unexpected error occurred');
     }
   }
@@ -121,16 +117,26 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User?> getCurrentUser() async {
     try {
-      final userId = await _secureStorage.read('user_id');
-      if (userId == null) return null;
+      final token = await _secureStorage.read('token');
+      if (token == null) return null;
 
-      final response = await _dio.get(AppConstants.studentInfoEndpoint);
-      
-      if (response.data['status'] == 'success') {
-        return User.fromJson(response.data['data']['student']);
+      // Instead of making another API call, reconstruct the user from stored data
+      final userId = await _secureStorage.read('user_id');
+      final username = await _secureStorage.read('username');
+      final role = await _secureStorage.read('role');
+
+      if (userId != null && username != null) {
+        return User(
+          id: userId,
+          username: username,
+          role: role ?? 'student',
+          isActive: true,
+          token: token,
+        );
       }
       return null;
     } catch (e) {
+      print('Error getting current user: $e');
       return null;
     }
   }

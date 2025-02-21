@@ -72,4 +72,19 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> checkAuthState() async {
+    try {
+      final isAuth = await _authRepository.isAuthenticated();
+      if (isAuth) {
+        final user = await _authRepository.getCurrentUser();
+        if (user != null) {
+          _currentUser = user;
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      print('Error checking auth state: $e');
+    }
+  }
 } 
