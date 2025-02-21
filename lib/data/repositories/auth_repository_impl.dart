@@ -92,7 +92,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String newPassword,
   ) async {
     try {
-      final response = await _dio.put(
+      final response = await _dio.post(
         AppConstants.changePasswordEndpoint,
         data: {
           'currentPassword': currentPassword,

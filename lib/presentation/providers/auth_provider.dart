@@ -51,7 +51,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<bool> changePassword(String currentPassword, String newPassword) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -64,9 +64,14 @@ class AuthProvider extends ChangeNotifier {
 
       if (!response.success) {
         _error = response.error;
+        notifyListeners();
+        return false;
       }
+      return true;
     } catch (e) {
       _error = 'Failed to change password';
+      notifyListeners();
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
